@@ -4,40 +4,35 @@ from selenium.webdriver.common.by import By
 import time
 from secrets import instagram_username, instagram_password
 
-class InstagramBot:
-    def __init__(self,username,password):
-        self.username = username
-        self.password = password
-        self.bot = webdriver.Firefox()
-
-    def login(self):
-        bot = self.bot
-        bot.get('https://www.instagram.com/')
-        time.sleep(3)
-        #Inspect in console input fields and then copy XPath
-        email = bot.find_element(By.XPATH, '/html/body/div[2]/div/div/div[2]/div/div/div[1]/section/main/article/div[2]/div[1]/div[2]/form/div/div[1]/div/label/input')
-        password = bot.find_element(By.XPATH, '/html/body/div[2]/div/div/div[2]/div/div/div[1]/section/main/article/div[2]/div[1]/div[2]/form/div/div[2]/div/label/input')
-        submit_button = bot.find_element(By.XPATH, '//*[@id="loginForm"]/div/div[3]/button')
-        email.send_keys(self.username)
-        password.send_keys(self.password)
-        submit_button.click()
-        # password.send_keys(Keys.RETURN)
-        time.sleep(10)
+bot = webdriver.Firefox()
+def login():
+    bot.get('https://www.instagram.com/')
+    time.sleep(3)
+    #Inspect in console input fields and then copy XPath
+    email = bot.find_element(By.XPATH, '/html/body/div[2]/div/div/div[2]/div/div/div[1]/section/main/article/div[2]/div[1]/div[2]/form/div/div[1]/div/label/input')
+    password = bot.find_element(By.XPATH, '/html/body/div[2]/div/div/div[2]/div/div/div[1]/section/main/article/div[2]/div[1]/div[2]/form/div/div[2]/div/label/input')
+    submit_button = bot.find_element(By.XPATH, '//*[@id="loginForm"]/div/div[3]/button')
+    email.send_keys(instagram_username)
+    password.send_keys(instagram_password)
+    submit_button.click()
+    # password.send_keys(Keys.RETURN)
+    time.sleep(10)
     
-    def like_posts(self, hashtag):
-        bot = self.bot
+def like_posts(hashtags):
+    for hashtag in hashtags:
         bot.get('https://www.instagram.com/explore/tags/' + hashtag + '/')
         time.sleep(5)
         # Scroll down to load more posts
         bot.execute_script('window.scrollTo(0, document.body.scrollHeight)')
-        time.sleep(2)
-        
         # Find all post links
-        parent = bot.find_element(By.CSS_SELECTOR, '._ac7v')
-        posts = parent.find_elements(By.CSS_SELECTOR, '._aabd')
+        parent = bot.find_element(By.CSS_SELECTOR, '._aaq8 > div:nth-child(2) > div:nth-child(1)')
+        posts = parent.find_elements(By.CSS_SELECTOR, '._ac7v > ._aabd')
+        links = []
         for post in posts:
+            link = post.find_element(By.TAG_NAME, 'a').get_attribute('href')
+            links.append(link)
+        for link in links:
             try:
-                link = post.find_element(By.TAG_NAME, 'a').get_attribute('href')
                 if link:
                     bot.get(link)
                     time.sleep(5)
@@ -47,11 +42,11 @@ class InstagramBot:
                         time.sleep(10)
                     except Exception as ex:
                         print(f"Error liking post: {ex}")
-                        time.sleep(60)
+                        bot.close()
             except Exception as ex:
                 print(f"Error extracting link: {ex}")
-                time.sleep(2)
-bot = InstagramBot(instagram_username, instagram_password)
-bot.login()
-bot.like_posts('nature')
+                bot.close()
+#Execute functions
+login()
+like_posts(["nature", "photography", "lake", "sea", "beach", "mountin", "sunrise", "sky", "sun", "animals", "dogs", "cats", "naturephotography"])
 
