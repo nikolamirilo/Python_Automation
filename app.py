@@ -48,5 +48,5 @@ def like_posts(hashtags):
                 bot.close()
 #Execute functions
 login()
-like_posts(["animals", "nature", "lake", "sea", "beach", "mountin", "sunrise", "sky", "sun", "animals", "dogs", "cats", "naturephotography"])
+like_posts(["dogs", "cats", "hedgehogs", "sea", "beach", "mountin", "sunrise", "sky", "sun", "animals", "dogs", "cats", "naturephotography"])
 
